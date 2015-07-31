@@ -7,14 +7,15 @@ from kivy.properties import NumericProperty, ReferenceListProperty, ObjectProper
 from kivy.core.audio import SoundLoader
 from kivy.uix.textinput import TextInput
 from kivy.uix.label import Label
-from kivy.uix.colorpicker import CBLColorWheel
+#from kivy.uix.colorpicker import CBLColorWheel
 from random import randint
 
 
 # Create both screens. Please note the root.manager.current: this is how
 # you can control the ScreenManager from kv. Each screen has by default a
 # property manager that gives you the instance of the ScreenManager used.
-
+def on_enter(instance, value):
+    print('User pressed enter in', instance)
 Builder.load_string("""
 <StartScreen>:
     BoxLayout:
@@ -43,6 +44,8 @@ Builder.load_string("""
         orientation: 'vertical'
         Label:
             text: 'Input Cammands to setup Game:'
+        TextInput: ('')
+        
         BoxLayout:
             orientation: 'horizontal'
             Button:
@@ -89,6 +92,7 @@ Builder.load_string("""
             text: 'Input key Cammand to setup forward comand:'
         BoxLayout:
             orientation: 'vertical'
+            TextInput:''
             Button:
                 text:'Back'
                 on_press: root.manager.current = 'options'
