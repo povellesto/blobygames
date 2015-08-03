@@ -11,7 +11,7 @@ Builder.load_string("""
         Button:
             text: 'Play'
             
-    ProgressBar: (max=1000)
+    
             
 """)
             
