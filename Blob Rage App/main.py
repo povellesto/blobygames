@@ -26,12 +26,23 @@ Builder.load_string("""
             text: 'Play'
             on_press: root.manager.current = 'gameOptions'
         
+<Error>:
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            text:'ERROR'
+        Button:
+            text: 'Back'
+            on_press: root.manager.current = 'options'
+            
+<ProgressBar>:
 
 <OptionsScreen>:
     BoxLayout:
         orientation: 'vertical'
         Button:
             text: 'Sound'
+            on_press: root.manager.current = 'error'
         Button:
             text:' Controls'
             on_press: root.manager.current = 'controls'
@@ -42,15 +53,12 @@ Builder.load_string("""
 <GameOptionsScreen>:
     BoxLayout:
         orientation: 'vertical'
-        Label:
-            text: 'Input Cammands to setup Game:'
-        TextInput: ('')
-        
-        BoxLayout:
-            orientation: 'horizontal'
-            Button:
-                text:'Back'
-                on_press: root.manager.current = 'start'
+        Button:
+            text:'Level'
+        TextInput:
+        Button:
+            text:'Back'
+            on_press: root.manager.current = 'start'
 
 
 <Blob>:
@@ -84,19 +92,21 @@ Builder.load_string("""
             on_press: root.manager.current = 'options'
         Button:
             text:'Back to main menu'
-
+            on_press: root.manager.current = 'start'
 <forwardOptionsScreen>:
     BoxLayout:
         orientation: 'vertical'
         Label:
-            text: 'Input key Cammand to setup forward comand:'
+            text: 'PRESS A KEY'
         BoxLayout:
-            orientation: 'vertical'
-            TextInput:''
+            orientation: 'horizontal'
+            TextInput:
             Button:
                 text:'Back'
                 on_press: root.manager.current = 'options'
-
+            Button:
+                text:'ENTER'
+                on_press: root.manager.current = 'controls'
 """)
 
 class Blob(Widget):
@@ -110,18 +120,28 @@ class Blob(Widget):
 
     def move(self):
         self.pos = Vector(*self.velocity) + Vector(*self.pos)
+        
+
 
 class StartScreen(Screen):
     pass
-
+class ProgressBar(Screen):
+    def __init__(self, **kwargs):
+        super(StartScreen, self).__init__(**kwargs)
+        self.pb = ProgressBar(max=100)
+        self.add_widget(self.pb)
+    def update(self, dt):
+        if self.pb.value < 1000:
+            self.pb.value += dt * 5
 class OptionsScreen(Screen):
     pass
-
 class GameOptionsScreen(Screen):
     pass
 class ControlsScreen (Screen):
     pass
 class forwardOptionsScreen(Screen):
+    pass
+class Error (Screen):
     pass
 class GameScreen(Screen):
     #def __init__(self, **kwargs):
@@ -133,6 +153,7 @@ class GameScreen(Screen):
             #blob.y = randint(0, self.height)
             #self.blobs.append(blob)
             #self.add_widget(blob)
+
 
     def update(self, dt):
         self.blob.move()
@@ -154,6 +175,8 @@ sm.add_widget(GameScreen(name='game'))
 sm.add_widget(GameOptionsScreen(name='gameOptions'))
 sm.add_widget(ControlsScreen(name='controls'))
 sm.add_widget(forwardOptionsScreen(name='forwardOptions'))
+sm.add_widget(Error(name='error'))
+sm.add_widget(ProgressBar(name='progressbar'))
 class TestApp(App):
     sound = None
     def build(self):
@@ -161,6 +184,7 @@ class TestApp(App):
         #self.sound.volume = 1
         #self.bind(on_stop=self.sound_replay)
         #self.sound.play()
+        Clock.schedule_interval(sm.current_screen.update, 1.0/60.0)
         return sm
 
 if __name__ == '__main__':
