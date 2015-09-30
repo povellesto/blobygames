@@ -7,6 +7,9 @@ from kivy.properties import NumericProperty, ReferenceListProperty, ObjectProper
 from kivy.core.audio import SoundLoader
 from kivy.uix.textinput import TextInput
 from kivy.uix.label import Label
+from kivy.uix.progressbar import ProgressBar
+from kivy.properties import StringProperty
+from kivy.clock import Clock
 #from kivy.uix.colorpicker import CBLColorWheel
 from random import randint
 
@@ -25,7 +28,14 @@ Builder.load_string("""
         Button:
             text: 'Play'
             on_press: root.manager.current = 'gameOptions'
-        
+            
+<Progresscreen>:
+    BoxLayout:    
+        Label:
+            text_size: self.size
+            halign: 'left'
+            valign: 'bottom'
+            text: root.loading
 <Error>:
     BoxLayout:
         orientation: 'vertical'
@@ -35,7 +45,6 @@ Builder.load_string("""
             text: 'Back'
             on_press: root.manager.current = 'options'
             
-<ProgressBar>:
 
 <OptionsScreen>:
     BoxLayout:
@@ -122,17 +131,25 @@ class Blob(Widget):
         self.pos = Vector(*self.velocity) + Vector(*self.pos)
         
 
-
-class StartScreen(Screen):
-    pass
-class ProgressBar(Screen):
+class Progresscreen(Screen):
+    loading = StringProperty()
     def __init__(self, **kwargs):
-        super(StartScreen, self).__init__(**kwargs)
+        self.dots = 0
+        super(Progresscreen, self).__init__(**kwargs)
         self.pb = ProgressBar(max=100)
         self.add_widget(self.pb)
     def update(self, dt):
-        if self.pb.value < 1000:
+        if self.pb.value < 99:
             self.pb.value += dt * 5
+            self.dots += 1
+            if self.dots ==400:
+                self.dots= 0
+            self.loading = "Loading" + ("."*(self.dots/100))
+        else:
+            self.manager.current ='start'
+
+class StartScreen(Screen):
+    pass
 class OptionsScreen(Screen):
     pass
 class GameOptionsScreen(Screen):
@@ -169,6 +186,7 @@ class GameScreen(Screen):
 
 # Create the screen manager
 sm = ScreenManager()
+sm.add_widget(Progresscreen(name='progressbar'))
 sm.add_widget(StartScreen(name='start'))
 sm.add_widget(OptionsScreen(name='options'))
 sm.add_widget(GameScreen(name='game'))
@@ -176,7 +194,6 @@ sm.add_widget(GameOptionsScreen(name='gameOptions'))
 sm.add_widget(ControlsScreen(name='controls'))
 sm.add_widget(forwardOptionsScreen(name='forwardOptions'))
 sm.add_widget(Error(name='error'))
-sm.add_widget(ProgressBar(name='progressbar'))
 class TestApp(App):
     sound = None
     def build(self):
